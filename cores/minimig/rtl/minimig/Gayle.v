@@ -45,6 +45,7 @@ module gayle
 	input	lwr,
 	input	sel_ide,			// $DAxxxx
 	input	sel_gayle,			// $DExxxx
+	input	sel_pccard,			// $A00000-$A7FFFF
 	output	irq,
 	output	nrdy,				// fifo is not ready for reading 
 	input	[1:0] hdd_ena,		// enables Master & Slave drives
@@ -58,8 +59,17 @@ module gayle
 	input	hdd_status_wr,
 	input	hdd_data_wr,
 	input	hdd_data_rd,
-  output hd_fwr,
-  output hd_frd
+	output	hd_fwr,
+	output	hd_frd,
+	
+	output	cc_a0,
+	output	cc_reg,
+	output	cc_iord,
+	output	cc_iowr,
+	output	cc_oe,
+	output	cc_we,
+	output	cc_ena,
+	input	cc_ireq
 );
 
 localparam VCC = 1'b1;

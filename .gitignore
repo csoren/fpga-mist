@@ -1,0 +1,6 @@
+cores/minimig/fpga/altera/db/
+cores/minimig/fw/amiga_boot/bin/amiga_boot.mif
+cores/minimig/fw/amiga_boot/bin/amiga_boot.hex
+cores/minimig/fw/amiga_boot/bin/amiga_boot.bin
+cores/minimig/fpga/altera/out/
+cores/minimig/fpga/altera/incremental_db/

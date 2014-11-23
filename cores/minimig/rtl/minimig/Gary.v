@@ -69,8 +69,9 @@ module gary
 	output	xbs,					//cross bridge select, active dbr prevents access
 	
 	input	[3:0] memory_config,	//selected memory configuration
-  input ecs,            // ECS chipset enable
+	input	ecs,					// ECS chipset enable
 	input	hdc_ena,				//enables hdd interface
+	input	pccard_ena,				// enable PC Card interface
 	
 	output	ram_rd,					//bus read
 	output	ram_hwr,				//bus high write
@@ -86,7 +87,8 @@ module gary
 	output 	sel_cia_b, 				//select cia B
 	output	sel_rtc,				//select $DCxxxx
 	output	sel_ide,				//select $DAxxxx
-	output	sel_gayle				//select $DExxxx
+	output	sel_gayle,				//select $DExxxx
+	output	sel_pccard				//select $A0xxxx-$A3xxxx
 );
 
 wire	[2:0] t_sel_slow;
@@ -156,6 +158,8 @@ assign sel_rtc = (cpu_address_in[23:16]==8'b1101_1100) ? 1'b1 : 1'b0;   //RTC re
 assign sel_ide = hdc_ena && cpu_address_in[23:16]==8'b1101_1010 ? 1'b1 : 1'b0;		//IDE registers at $DA0000 - $DAFFFF	
 
 assign sel_gayle = hdc_ena && cpu_address_in[23:12]==12'b1101_1110_0001 ? 1'b1 : 1'b0;		//GAYLE registers at $DE1000 - $DE1FFF
+
+assign sel_pccard = pccard_ena && cpu_address_in[23:19]==5'b1010_0 ? 1'b1 : 1'b0;	// PC Card at $A00000 - $A7FFFF
 
 assign sel_reg = cpu_address_in[23:21]==3'b110 ? ~(sel_xram | sel_rtc | sel_ide | sel_gayle) : 1'b0;		//chip registers at $DF0000 - $DFFFFF
 

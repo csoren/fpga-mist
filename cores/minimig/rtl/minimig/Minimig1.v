@@ -366,8 +366,9 @@ wire	[2:0] ide_config;		//HDD & HDC config: bit #0 enables Gayle, bit #1 enables
 //gayle stuff
 wire	sel_ide;				//select IDE drive registers
 wire	sel_gayle;				//select GAYLE control registers
+wire	sel_pccard;				//select PC Card expansion registers
 wire	gayle_irq;				//interrupt request
-wire  gayle_nrdy;       // HDD fifo is not ready for reading
+wire	gayle_nrdy;				// HDD fifo is not ready for reading
 //emulated hard disk drive signals
 wire	hdd_cmd_req;			//hard disk controller has written command register and requests processing
 wire	hdd_dat_req;			//hard disk controller requests data from emulated hard disk drive
@@ -391,6 +392,17 @@ wire  [5:0] joy_emu;
 
 wire  dtr;
 
+// PC Card wires
+
+wire cc_a0;
+wire cc_reg;
+wire cc_iord;
+wire cc_iowr;
+wire cc_oe;
+wire cc_we;
+wire cc_ena;
+wire cc_ireq;
+wire [15:0] cc_data_out;
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
@@ -851,6 +863,7 @@ gary GARY1
 	.xbs(xbs),
 	.memory_config(memory_config[3:0]),
 	.hdc_ena(ide_config[0]), // Gayle decoding enable	
+	.pccard_ena(1'b1),
 	.ram_rd(ram_rd),
 	.ram_hwr(ram_hwr),
 	.ram_lwr(ram_lwr),
@@ -865,7 +878,8 @@ gary GARY1
 	.sel_cia_a(sel_cia_a),
 	.sel_cia_b(sel_cia_b),
 	.sel_ide(sel_ide),
-	.sel_gayle(sel_gayle)
+	.sel_gayle(sel_gayle),
+	.sel_pccard(sel_pccard)
 );
 
 gayle GAYLE1
@@ -880,6 +894,7 @@ gayle GAYLE1
 	.lwr(cpu_lwr),
 	.sel_ide(sel_ide),
 	.sel_gayle(sel_gayle),
+	.sel_pccard(sel_pccard),
 	.irq(gayle_irq),
   .nrdy(gayle_nrdy),
 	.hdd_ena(ide_config[2:1]),
@@ -893,9 +908,37 @@ gayle GAYLE1
 	.hdd_status_wr(hdd_status_wr),
 	.hdd_data_wr(hdd_data_wr),
 	.hdd_data_rd(hdd_data_rd),
-  .hd_fwr(hd_fwr),
-  .hd_frd(hd_frd)
+	.hd_fwr(hd_fwr),
+	.hd_frd(hd_frd),
+  
+	.cc_a0(cc_a0),
+	.cc_reg(cc_reg),
+	.cc_iord(cc_iord),
+	.cc_iowr(cc_iowr),
+	.cc_oe(cc_oe),
+	.cc_we(cc_we),
+	.cc_ena(cc_ena),
+	.cc_ireq(cc_ireq)
 );
+
+pccard_ne2000 Ethernet(
+	.clk(clk),
+	.reset(reset),
+	
+	.addr({4'b000, cpu_address_out[23], cpu_address_out[20:1], cc_a0}),
+	.data_in(cpu_data_out),
+	.data_out(cc_data_out),
+
+	.cc_reg(cc_reg),
+	.cc_iord(cc_iord),
+	.cc_iowr(cc_iowr),
+	.cc_oe(cc_oe),
+	.cc_we(cc_we),
+	.cc_ena(cc_ena),
+	.cc_ireq(cc_ireq)
+);
+	
+	
 	
 //instantiate boot rom
 //bootrom BOOTROM1 
