@@ -32,6 +32,9 @@
 // 2009-11-18	- changed sector buffer size
 // 2010-04-13	- changed sector buffer size
 // 2010-08-10	- improved BSY signal handling
+//
+// -- CES --
+// 2014-11-23   - Added wires for PC Card
 
 module gayle
 (
@@ -68,7 +71,8 @@ module gayle
 	output	cc_iowr,
 	output	cc_oe,
 	output	cc_we,
-	output	cc_ena,
+	output	cc_ce1,
+	output	cc_ce2,
 	input	cc_ireq
 );
 
@@ -316,6 +320,27 @@ fifo4096x16 SECBUF1
 // fifo is not ready for reading
 
 assign nrdy = pio_in & sel_fifo & fifo_empty;
+
+// PC Card
+
+wire cc_sel_attr = sel_pccard && address_in[18:17] == 2'b00;
+wire cc_sel_io = sel_pccard && address_in[18:17] == 2'b01;
+
+wire cc_byte_access = address_in[16];
+
+assign cc_reg = cc_sel_attr || cc_sel_io;
+
+assign cc_oe = cc_sel_attr && rd;
+assign cc_we = cc_sel_attr && (hwr || lwr);
+
+assign cc_iord = cc_sel_io && rd;
+assign cc_iowr = cc_sel_io && (hwr || lwr);
+
+assign cc_a0 = sel_pccard && cc_byte_access;
+
+assign cc_ce1 = sel_pccard;
+assign cc_ce2 = sel_pccard && !cc_byte_access;
+
 
 //data_out multiplexer
 assign data_out = (sel_fifo && rd ? fifo_data_out : sel_status ? (!dev && hdd_ena[0]) || (dev && hdd_ena[1]) ? {status,8'h00} : 16'h00_00 : sel_tfr && rd ? {tfr_out,8'h00} : 16'h00_00)

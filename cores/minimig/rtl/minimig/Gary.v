@@ -44,6 +44,9 @@
 //
 // AMR:
 // 2012-03-23  - Added select for Akiko
+//
+// CES:
+// 2014-11-23 - Added select for PC Card
 
 module gary
 (
@@ -163,7 +166,7 @@ assign sel_pccard = pccard_ena && cpu_address_in[23:19]==5'b1010_0 ? 1'b1 : 1'b0
 
 assign sel_reg = cpu_address_in[23:21]==3'b110 ? ~(sel_xram | sel_rtc | sel_ide | sel_gayle) : 1'b0;		//chip registers at $DF0000 - $DFFFFF
 
-assign sel_cia = cpu_address_in[23:21]==3'b101 ? 1'b1 : 1'b0;
+assign sel_cia = cpu_address_in[23:20]==4'b1011 ? 1'b1 : 1'b0;
 
 //cia a address decode
 assign sel_cia_a = sel_cia & ~cpu_address_in[12];

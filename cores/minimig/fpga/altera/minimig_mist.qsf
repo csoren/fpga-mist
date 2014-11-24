@@ -347,6 +347,7 @@ set_global_assignment -name VERILOG_FILE ../../rtl/minimig/Agnus.v
 set_global_assignment -name VERILOG_FILE ../../rtl/minimig/ActionReplay3.v
 set_global_assignment -name QIP_FILE amiga_boot.qip
 set_global_assignment -name VERILOG_FILE ../../fw/amiga_boot/bin/amiga_boot.v
+set_global_assignment -name VERILOG_FILE ../../fw/ethernet/bin/ethernet_attr.v
 set_global_assignment -name SIGNALTAP_FILE stp1.stp
 set_global_assignment -name SDC_FILE minimig_mist.sdc
 set_global_assignment -name QIP_FILE ../../rtl/cycloneiii/PLLROM_7MHz.qip

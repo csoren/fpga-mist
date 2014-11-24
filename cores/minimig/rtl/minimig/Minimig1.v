@@ -400,7 +400,8 @@ wire cc_iord;
 wire cc_iowr;
 wire cc_oe;
 wire cc_we;
-wire cc_ena;
+wire cc_ce1;
+wire cc_ce2;
 wire cc_ireq;
 wire [15:0] cc_data_out;
 
@@ -917,7 +918,8 @@ gayle GAYLE1
 	.cc_iowr(cc_iowr),
 	.cc_oe(cc_oe),
 	.cc_we(cc_we),
-	.cc_ena(cc_ena),
+	.cc_ce1(cc_ce1),
+	.cc_ce2(cc_ce2),
 	.cc_ireq(cc_ireq)
 );
 
@@ -926,7 +928,7 @@ pccard_ne2000 Ethernet(
 	.reset(reset),
 	
 	.addr({4'b000, cpu_address_out[23], cpu_address_out[20:1], cc_a0}),
-	.data_in(cpu_data_out),
+	.data_in({cpu_data_out[7:0], cpu_data_out[15:8]}),
 	.data_out(cc_data_out),
 
 	.cc_reg(cc_reg),
@@ -934,7 +936,8 @@ pccard_ne2000 Ethernet(
 	.cc_iowr(cc_iowr),
 	.cc_oe(cc_oe),
 	.cc_we(cc_we),
-	.cc_ena(cc_ena),
+	.cc_ce1(cc_ce1),
+	.cc_ce2(cc_ce2),
 	.cc_ireq(cc_ireq)
 );
 	
@@ -999,7 +1002,8 @@ assign cpu_data_in[15:0] = gary_data_out[15:0]
 						 | boot_data_out[15:0]
 						 | cia_data_out[15:0]
 						 | ar3_data_out[15:0]
-						 | gayle_data_out[15:0];
+						 | gayle_data_out[15:0]
+						 | {cc_data_out[7:0], cc_data_out[15:8]};
 
 assign custom_data_out[15:0] = agnus_data_out[15:0]
 							 | paula_data_out[15:0]
