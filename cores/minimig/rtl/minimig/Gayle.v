@@ -73,7 +73,8 @@ module gayle
 	output	cc_we,
 	output	cc_ce1,
 	output	cc_ce2,
-	input	cc_ireq
+	input	cc_ireq,
+	input	cc_cd
 );
 
 localparam VCC = 1'b1;
@@ -125,6 +126,7 @@ wire 	sel_status;		// HDD status register select
 wire 	sel_command;	// HDD command register select
 wire 	sel_intreq;		// Gayle interrupt request status register select
 wire 	sel_intena;		// Gayle interrupt enable register select
+wire 	sel_cardstat;	// Gayle card status register select ($DA8000)
 
 // internal registers
 reg		intena;			// Gayle IDE interrupt enable bit
@@ -152,7 +154,7 @@ wire 	fifo_empty;
 wire	fifo_last;			// last word of a sector is being read
 
 // gayle id reg
-reg		[1:0] gayleid_cnt;	// sequence counter
+reg		[2:0] gayleid_cnt;	// sequence counter
 wire	gayleid;			// output data (one bit wide)
 
 // hd leds
@@ -173,6 +175,7 @@ assign sel_tfr = sel_ide && address_in[15:14]==2'b00 && !address_in[12] ? VCC : 
 assign sel_status = rd && sel_tfr && address_in[4:2]==3'b111 ? VCC : GND;
 assign sel_command = hwr && sel_tfr && address_in[4:2]==3'b111 ? VCC : GND;
 assign sel_fifo = sel_tfr && address_in[4:2]==3'b000 ? VCC : GND;
+assign sel_cardstat = sel_ide && address_in[15:12]==4'b1000 ? VCC : GND;	//CS
 assign sel_intreq = sel_ide && address_in[15:12]==4'b1001 ? VCC : GND;	//INTREQ
 assign sel_intena = sel_ide && address_in[15:12]==4'b1010 ? VCC : GND;	//INTENA
 
@@ -225,15 +228,15 @@ always @(posedge clk)
 	else if (sel_intena && hwr)
 		intena <= data_in[15];
 			
-// gayle id register: reads 1->1->0->1 on MSB
+// gayle id register: reads 1->1->0->1->0->0->0->0 on MSB
 always @(posedge clk)
 	if (sel_gayleid)
 		if (hwr) // a write resets sequence counter
-			gayleid_cnt <= 2'd0;
+			gayleid_cnt <= 3'd0;
 		else if (rd)
-			gayleid_cnt <= gayleid_cnt + 2'd1;
+			gayleid_cnt <= gayleid_cnt + 3'd1;
 
-assign gayleid = ~gayleid_cnt[1] | gayleid_cnt[0]; // Gayle ID output data
+assign gayleid = ~gayleid_cnt[2] & (~gayleid_cnt[1] | gayleid_cnt[0]); // Gayle ID output data
 
 // status register (write only from SPI host)
 // 7 - busy status (write zero to finish command processing: allow host access to task file registers)
@@ -346,7 +349,8 @@ assign cc_ce2 = sel_pccard && !cc_byte_access;
 assign data_out = (sel_fifo && rd ? fifo_data_out : sel_status ? (!dev && hdd_ena[0]) || (dev && hdd_ena[1]) ? {status,8'h00} : 16'h00_00 : sel_tfr && rd ? {tfr_out,8'h00} : 16'h00_00)
 			   | (sel_intreq && rd ? {intreq,15'b000_0000_0000_0000} : 16'h00_00)				
 			   | (sel_intena && rd ? {intena,15'b000_0000_0000_0000} : 16'h00_00)				
-			   | (sel_gayleid && rd ? {gayleid,15'b000_0000_0000_0000} : 16'h00_00);
+			   | (sel_gayleid && rd ? {gayleid,15'b000_0000_0000_0000} : 16'h00_00)
+			   | (sel_cardstat && rd ? {1'b0,cc_cd,14'b00_1000_0000_0000} : 16'h00_00);
  
 //===============================================================================================//
 

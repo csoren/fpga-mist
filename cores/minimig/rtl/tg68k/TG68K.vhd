@@ -178,10 +178,10 @@ BEGIN
 	sel_fast <= '1' when state/="01" AND
 		(
 			(turbochip_ena='1' and turbochip_d='1' AND cpuaddr(23 downto 21)="000" )
-			OR cpuaddr(23 downto 21)="001"
-			OR cpuaddr(23 downto 21)="010"
-			OR cpuaddr(23 downto 21)="011"
-			OR cpuaddr(23 downto 21)="100"
+			OR (cpuaddr(23 downto 21)="001" AND fastramcfg(1 downto 0)/="00")
+			OR (cpuaddr(23 downto 21)="010" AND fastramcfg(1)='1')
+			OR (cpuaddr(23 downto 21)="011" AND fastramcfg(1 downto 0)="11")
+			OR (cpuaddr(23 downto 21)="100" AND fastramcfg(1 downto 0)="11")
 			OR sel_ziiiram='1'
 		)
 		ELSE '0'; --$200000 - $9FFFFF

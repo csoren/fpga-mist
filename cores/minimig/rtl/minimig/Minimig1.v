@@ -394,6 +394,8 @@ wire  dtr;
 
 // PC Card wires
 
+wire pccard_ena = 1'b1;
+
 wire cc_a0;
 wire cc_reg;
 wire cc_iord;
@@ -864,7 +866,7 @@ gary GARY1
 	.xbs(xbs),
 	.memory_config(memory_config[3:0]),
 	.hdc_ena(ide_config[0]), // Gayle decoding enable	
-	.pccard_ena(1'b1),
+	.pccard_ena(pccard_ena),
 	.ram_rd(ram_rd),
 	.ram_hwr(ram_hwr),
 	.ram_lwr(ram_lwr),
@@ -920,7 +922,8 @@ gayle GAYLE1
 	.cc_we(cc_we),
 	.cc_ce1(cc_ce1),
 	.cc_ce2(cc_ce2),
-	.cc_ireq(cc_ireq)
+	.cc_ireq(cc_ireq),
+	.cc_cd(pccard_ena)
 );
 
 pccard_ne2000 Ethernet(
