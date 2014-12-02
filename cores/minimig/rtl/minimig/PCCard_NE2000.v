@@ -48,7 +48,7 @@ always @(posedge clk)
 	if (attr_write && sel_enabled && byte_access_even)
 		enabled <= data_in[0];
 
-wire [3:0] io_register = { addr[3:1], byte_access_odd };
+wire [4:0] io_register = { addr[4:1], byte_access_odd };
 
 assign data_out =
 	(reset)                        ? 16'd0 :

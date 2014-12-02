@@ -35,7 +35,7 @@ CISTPL_FUNCID_NETWORK	EQU	$06
 	dc.b	$81
 	dc.b	$04			;TPCE_IF
 	dc.b	$08			;TPCE_FS = IO Space
-	dc.b	(1<<5)!4	;TPCE_IO - 8 bit IO, 4 address lines
+	dc.b	(1<<5)!5	;TPCE_IO - 8 bit IO, 5 address lines
 .cftable_entry_end
 	
 	dc.b	CISTPL_FUNC_ID
