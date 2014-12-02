@@ -53,7 +53,7 @@ entity TG68K is
         fromram    	  : in std_logic_vector(15 downto 0);
         ramready      : in std_logic:='0';
         cpu           : in std_logic_vector(1 downto 0);
-        fastramcfg           : in std_logic_vector(5 downto 0);
+        fastramcfg           : in std_logic_vector(2 downto 0);
 		  turbochipram : in std_logic;
         ramaddr    	  : out std_logic_vector(31 downto 0);
         cpustate      : out std_logic_vector(5 downto 0);
@@ -168,7 +168,7 @@ BEGIN
 		ELSE r_data;
 --	toram <= data_write;
 	
-   sel_autoconfig <= '1' when cpuaddr(23 downto 19)="11101" AND autoconfig_out/="00" ELSE '0'; --$E80000 - $EFFFFF
+   sel_autoconfig <= '0'; --'1' when cpuaddr(23 downto 19)="11101" AND autoconfig_out/="00" ELSE '0'; --$E80000 - $EFFFFF
 
 	sel_ziiiram <='1' when cpuaddr(31 downto 24)=ziii_base and ziiiram_ena='1' else '0';
 
@@ -178,10 +178,10 @@ BEGIN
 	sel_fast <= '1' when state/="01" AND
 		(
 			(turbochip_ena='1' and turbochip_d='1' AND cpuaddr(23 downto 21)="000" )
-			OR (cpuaddr(23 downto 21)="001" AND fastramcfg(1 downto 0)/="00")
-			OR (cpuaddr(23 downto 21)="010" AND fastramcfg(1)='1')
-			OR (cpuaddr(23 downto 21)="011" AND fastramcfg(1 downto 0)="11")
-			OR (cpuaddr(23 downto 21)="100" AND fastramcfg(1 downto 0)="11")
+			OR cpuaddr(23 downto 21)="001"
+			OR cpuaddr(23 downto 21)="010"
+			--OR cpuaddr(23 downto 21)="011"
+			--OR cpuaddr(23 downto 21)="100"
 			OR sel_ziiiram='1'
 		)
 		ELSE '0'; --$200000 - $9FFFFF
